@@ -23,3 +23,7 @@ go.work.sum
 
 # env file
 .env
+
+bpf_skb_output_test
+*.pcap
+tags
