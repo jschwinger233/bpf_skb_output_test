@@ -12,7 +12,7 @@ import (
 	"github.com/cilium/ebpf"
 )
 
-type TestEvent struct{ Payload [1500]uint8 }
+type TestEvent struct{ Payload [4095]uint8 }
 
 // LoadTest returns the embedded CollectionSpec for Test.
 func LoadTest() (*ebpf.CollectionSpec, error) {
@@ -56,14 +56,16 @@ type TestSpecs struct {
 //
 // It can be passed ebpf.CollectionSpec.Assign.
 type TestProgramSpecs struct {
-	TpBtfNetifReceiveSkb *ebpf.ProgramSpec `ebpf:"tp_btf_netif_receive_skb"`
+	KprobeNetifReceiveSkbCore *ebpf.ProgramSpec `ebpf:"kprobe___netif_receive_skb_core"`
+	TpBtfNetifReceiveSkb      *ebpf.ProgramSpec `ebpf:"tp_btf_netif_receive_skb"`
 }
 
 // TestMapSpecs contains maps before they are loaded into the kernel.
 //
 // It can be passed ebpf.CollectionSpec.Assign.
 type TestMapSpecs struct {
-	PerfOutput *ebpf.MapSpec `ebpf:"perf_output"`
+	PerfOutput    *ebpf.MapSpec `ebpf:"perf_output"`
+	RingbufOutput *ebpf.MapSpec `ebpf:"ringbuf_output"`
 }
 
 // TestVariableSpecs contains global variables before they are loaded into the kernel.
@@ -93,12 +95,14 @@ func (o *TestObjects) Close() error {
 //
 // It can be passed to LoadTestObjects or ebpf.CollectionSpec.LoadAndAssign.
 type TestMaps struct {
-	PerfOutput *ebpf.Map `ebpf:"perf_output"`
+	PerfOutput    *ebpf.Map `ebpf:"perf_output"`
+	RingbufOutput *ebpf.Map `ebpf:"ringbuf_output"`
 }
 
 func (m *TestMaps) Close() error {
 	return _TestClose(
 		m.PerfOutput,
+		m.RingbufOutput,
 	)
 }
 
@@ -113,11 +117,13 @@ type TestVariables struct {
 //
 // It can be passed to LoadTestObjects or ebpf.CollectionSpec.LoadAndAssign.
 type TestPrograms struct {
-	TpBtfNetifReceiveSkb *ebpf.Program `ebpf:"tp_btf_netif_receive_skb"`
+	KprobeNetifReceiveSkbCore *ebpf.Program `ebpf:"kprobe___netif_receive_skb_core"`
+	TpBtfNetifReceiveSkb      *ebpf.Program `ebpf:"tp_btf_netif_receive_skb"`
 }
 
 func (p *TestPrograms) Close() error {
 	return _TestClose(
+		p.KprobeNetifReceiveSkbCore,
 		p.TpBtfNetifReceiveSkb,
 	)
 }
