@@ -64,7 +64,7 @@ func main() {
 		}
 		defer tp.Close()
 
-		perfReader, err := perf.NewReader(objs.PerfOutput, 1500*100)
+		perfReader, err := perf.NewReader(objs.PerfOutput, 1500*10000)
 		if err != nil {
 			slog.Error("Failed to create perf reader", "error", err)
 			return
